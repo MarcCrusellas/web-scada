@@ -3,11 +3,17 @@ import threading
 import websockets
 from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
+import json
+from pathlib import Path
+
+from request_handler import RequestHandler
+from in_memory_storage import InMemoryStorage
 
 class BaseService:
     def __init__(self):
         self.websocket_clients = set()  # Track connected WebSocket clients
         self.icon = None
+        self.storage = InMemoryStorage(Path.home() / "WSCADA" / "state.json")
 
     def create_taskbar_icon(self, loop):
         def create_image():
@@ -68,18 +74,18 @@ class BaseService:
         icon_thread.start()
 
     async def websocket_handler(self, websocket):
-        print("Client connected")
+        def log_websocket_event(event):
+            print(f"WebSocket event: {event}")
+
+        # Add logging to WebSocket events
+        log_websocket_event("Client connected")
         self.websocket_clients.add(websocket)
+        request_handler = RequestHandler(self.storage)
         try:
             async for message in websocket:
-                if message == 'hello':
-                    print("Hello World")
-                elif message == 'notify':
-                    await websocket.send("notification:This is a notification from the server!")
-                else:
-                    print(f"Received: {message}")
+                await request_handler.handle_request(websocket, message)
         except websockets.ConnectionClosed:
-            print("Client disconnected")
+            log_websocket_event("Client disconnected")
         finally:
             self.websocket_clients.remove(websocket)
 
@@ -107,3 +113,5 @@ class BaseService:
         self.transmitting = False
         if self.icon:
             self.icon.stop()
+
+

@@ -1,0 +1,8 @@
+<h2>Library Creator</h2>
+<button (click)="createLibrary()">Create New Library</button>
+<ul>
+  <!-- <li *for="let library of libraries" (click)="editLibrary(library)">{{ library.name }}</li> -->
+   @for ( library of libraries; track library.id ) {
+    <li (click)="editLibrary(library)">{{ library.name }}</li>
+    }
+</ul>

@@ -1,0 +1,9 @@
+<h2>Screen List</h2>
+<button (click)="createScreen()">Create New Screen</button>
+<ul>
+  <!-- <li *for="let screen of screens" (click)="editScreen(screen)">{{ screen.name }}</li> -->
+    @for ( screen of screens; track screen.id ) {
+        <li (click)="editScreen(screen)">{{ screen.name }}</li>
+    }
+
+</ul>
