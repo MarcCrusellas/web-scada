@@ -89,4 +89,58 @@ export class StorageService {
             this.ensureSocketConnection(() => this.flushMessageQueue());
         }
     }
+
+    logInfo(message: string): void {
+        this.sendMessage({ type: 'log_info', message });
+    }
+
+    logWarning(message: string): void {
+        this.sendMessage({ type: 'log_warning', message });
+    }
+
+    logError(message: string): void {
+        this.sendMessage({ type: 'log_error', message });
+    }
+
+    logDebug(message: string): void {
+        this.sendMessage({ type: 'log_debug', message });
+    }
+
+    setFile(fileName: string, fileContent: any): void {
+        this.sendMessage({ type: 'set_file', fileName, fileContent });
+    }
+
+    getFile(fileName: string): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.ensureSocketConnection(() => {
+                this.socket.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    if (message.type === 'get_file' && message.fileName === fileName) {
+                        resolve(message.content);
+                    }
+                };
+
+                this.socket.send(JSON.stringify({ type: 'get_file', fileName }));
+            });
+        });
+    }
+
+    startTransmission(): void {
+        this.sendMessage({ type: 'start_transmission' });
+    }
+
+    stopTransmission(): void {
+        this.sendMessage({ type: 'stop_transmission' });
+    }
+
+    private sendMessage(message: any): void {
+        console.log('Sending message:', message);
+        if (this.isSocketOpen) {
+            this.socket.send(JSON.stringify(message));
+        } else {
+            console.warn('WebSocket is closed. Queueing message for later:', message);
+            this.messageQueue.push(message);
+            this.ensureSocketConnection(() => this.flushMessageQueue());
+        }
+    }
 }

@@ -27,17 +27,27 @@ class DynamicStorage:
         else:
             return {"error": f"Unsupported request type: {request_type}"}
 
+    def set_file_content(self, file_path, file_content):
+        with self.lock:
+            # Ensure the file path is within the user folder/WSCADA/files
+            user_files_directory = self.base_directory / "files"
+            user_files_directory.mkdir(parents=True, exist_ok=True)
+            safe_file_path = user_files_directory / file_path.name
+
+            with open(safe_file_path, 'w') as file:
+                json.dump(file_content, file, indent=4)
+
     def get_file_content(self, file_path):
         with self.lock:
-            if not file_path.exists():
+            # Ensure the file path is within the user folder/WSCADA/files
+            user_files_directory = self.base_directory / "files"
+            safe_file_path = user_files_directory / file_path.name
+
+            if not safe_file_path.exists():
                 return {"error": "File not found."}
-            with open(file_path, 'r') as file:
+
+            with open(safe_file_path, 'r') as file:
                 try:
                     return {"content": json.load(file)}
                 except json.JSONDecodeError:
                     return {"error": "Failed to decode JSON content."}
-
-    def set_file_content(self, file_path, file_content):
-        with self.lock:
-            with open(file_path, 'w') as file:
-                json.dump(file_content, file, indent=4)

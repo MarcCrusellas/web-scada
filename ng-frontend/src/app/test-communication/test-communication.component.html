@@ -1,0 +1,21 @@
+<div class="container">
+  <h1>Test Communication with Backend</h1>
+
+  <!-- State Management Section -->
+  <div class="section">
+    <h2>State Management</h2>
+    <input type="text" [value]="stateKey()" (input)="onStateKeyChange($event)" placeholder="Enter state key" class="input" />
+    <textarea [value]="stateValue()" (input)="onStateValueChange($event)" placeholder="Enter state value" class="textarea"></textarea>
+    <button (click)="testFetchState()" class="button">Fetch State</button>
+    <button (click)="testUpdateState()" class="button">Update State</button>
+  </div>
+
+  <!-- File Management Section -->
+  <div class="section">
+    <h2>File Management</h2>
+    <input type="text" [value]="fileName()" (input)="onFileNameChange($event)" placeholder="Enter file name" class="input" />
+    <textarea [value]="fileContent()" (input)="onFileContentChange($event)" placeholder="Enter file content" class="textarea"></textarea>
+    <button (click)="testGetFile()" class="button">Get File</button>
+    <button (click)="testSetFile()" class="button">Set File</button>
+  </div>
+</div>

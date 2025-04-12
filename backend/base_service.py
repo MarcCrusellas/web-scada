@@ -5,15 +5,17 @@ from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
 import json
 from pathlib import Path
-
-from request_handler import RequestHandler
 from in_memory_storage import InMemoryStorage
+from state_handler import StateHandler
+from dynamic_storage import DynamicStorage
 
 class BaseService:
     def __init__(self):
         self.websocket_clients = set()  # Track connected WebSocket clients
         self.icon = None
         self.storage = InMemoryStorage(Path.home() / "WSCADA" / "state.json")
+        self.dynamic_storage = DynamicStorage(Path.home() / "WSCADA")
+        self.state_handler = StateHandler(self.storage)
 
     def create_taskbar_icon(self, loop):
         def create_image():
@@ -24,7 +26,7 @@ class BaseService:
             return image
 
         def send_notification():
-            print("Sending notification from taskbar icon...")
+            # print("Sending notification from taskbar icon...")
             if self.websocket_clients:
                 for client in self.websocket_clients:
                     try:
@@ -77,13 +79,21 @@ class BaseService:
         def log_websocket_event(event):
             print(f"WebSocket event: {event}")
 
-        # Add logging to WebSocket events
         log_websocket_event("Client connected")
         self.websocket_clients.add(websocket)
-        request_handler = RequestHandler(self.storage)
         try:
             async for message in websocket:
-                await request_handler.handle_request(websocket, message)
+                data = json.loads(message)
+                if data['type'] == 'fetch' or data['type'] == 'update':
+                    await self.state_handler.handle_fetch(websocket, data) if data['type'] == 'fetch' else await self.state_handler.handle_update(websocket, data)
+                elif data['type'] == 'set_file':
+                    self.dynamic_storage.set_file_content(Path(data['fileName']), data['fileContent'])
+                    await websocket.send(json.dumps({"type": "set_file", "status": "success"}))
+                elif data['type'] == 'get_file':
+                    result = self.dynamic_storage.get_file_content(Path(data['fileName']))
+                    await websocket.send(json.dumps({"type": "get_file", "content": result}))
+                else:
+                    await websocket.send(json.dumps({"type": "error", "message": "Unsupported message type"}))
         except websockets.ConnectionClosed:
             log_websocket_event("Client disconnected")
         finally:

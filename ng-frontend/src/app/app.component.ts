@@ -4,14 +4,7 @@ import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
-  template: `
-    <h1>{{ title }}</h1>
-    <nav>
-      <a routerLink="/screens">Screen List</a> |
-      <a routerLink="/library">Library Creator</a>
-    </nav>
-    <router-outlet></router-outlet>
-  `,
+  templateUrl: './app.component.html',
   imports: [RouterModule]
 })
 export class AppComponent {
