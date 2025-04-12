@@ -7,9 +7,9 @@ import servicemanager
 from base_service import BaseService
 
 class WebSocketService(win32serviceutil.ServiceFramework, BaseService):
-    _svc_name_ = "WebSocketService"
-    _svc_display_name_ = "WebSocket Service with Taskbar Icon"
-    _svc_description_ = "A WebSocket server with a taskbar icon for notifications."
+    _svc_name_ = "WSCADAService"
+    _svc_display_name_ = "WSCADA Service "
+    _svc_description_ = "WSCADA Service: A WebSocket server with a taskbar icon for notifications and data transmission control."
 
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)

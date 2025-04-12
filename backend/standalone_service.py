@@ -16,6 +16,9 @@ class StandaloneService(BaseService):
         self.create_taskbar_icon(loop)
         self.start_taskbar_icon()
 
+        # Start fake data generation
+        loop.create_task(self.generate_fake_data())
+
         # Keep running
         try:
             while True:

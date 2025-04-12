@@ -33,11 +33,30 @@ class BaseService:
             if self.icon:
                 self.icon.stop()
 
-        menu = Menu(
-            MenuItem("Send Notification", send_notification),
-            MenuItem("Exit", exit_service)
-        )
-        self.icon = Icon("WebSocketService", create_image(), menu=menu)
+        def start_transmission():
+            print("Starting data transmission...")
+            self.transmitting = True
+            self.update_taskbar_menu()
+
+        def stop_transmission():
+            print("Stopping data transmission...")
+            self.transmitting = False
+            self.update_taskbar_menu()
+
+        self.transmitting = False
+
+        def update_taskbar_menu():
+            menu_items = [
+                MenuItem("Send Notification", send_notification),
+                MenuItem("Start Transmission", start_transmission, visible=not self.transmitting),
+                MenuItem("Stop Transmission", stop_transmission, visible=self.transmitting),
+                MenuItem("Exit", exit_service)
+            ]
+            self.icon.menu = Menu(*menu_items)
+
+        self.update_taskbar_menu = update_taskbar_menu
+        self.icon = Icon("WebSocketService", create_image(), menu=Menu())
+        self.update_taskbar_menu()
 
     def start_taskbar_icon(self):
         def run_icon():
@@ -67,3 +86,21 @@ class BaseService:
         async with websockets.serve(self.websocket_handler, "localhost", 8080):
             print("WebSocket server started on ws://localhost:8080")
             await asyncio.Future()  # Run forever
+
+    async def generate_fake_data(self):
+        import random
+        while self.transmitting:
+            if self.websocket_clients:
+                data = random.randint(1, 100)
+                for client in self.websocket_clients:
+                    try:
+                        await client.send(f"data:{data}")
+                    except Exception as e:
+                        print(f"Failed to send data: {e}")
+            await asyncio.sleep(1)
+
+    def stop_service(self):
+        print("Stopping service...")
+        self.transmitting = False
+        if self.icon:
+            self.icon.stop()
