@@ -1,10 +1,12 @@
 import { signal , Component} from '@angular/core';
 import { StorageService } from '../core/services/storage.service';
+import { CodeEditorComponent } from '../components/code-editor/code-editor.component';
 
 @Component({
   selector: 'app-test-communication',
   templateUrl: './test-communication.component.html',
-  styleUrls: ['./test-communication.component.css']
+  styleUrls: ['./test-communication.component.css'],
+  imports: [CodeEditorComponent],
 })
 export class TestCommunicationComponent {
   stateKey = signal('');

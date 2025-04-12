@@ -1,0 +1,8 @@
+<div class="editor-container">
+  <ngx-monaco-editor
+    [options]="{ theme: 'vs-dark', language: 'javascript' }"
+    [(ngModel)]="code"
+    (ngModelChange)="onCodeChange($event)"
+    style="height: 500px; width: 100%;">
+  </ngx-monaco-editor>
+</div>

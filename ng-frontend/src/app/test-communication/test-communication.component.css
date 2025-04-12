@@ -1,61 +1,138 @@
-/* General container styling */
 .container {
-  max-width: 600px;
+  --primary-color: #0d6efd;
+  --secondary-color: #6c757d;
+  --background-color: rgba(255, 255, 255, 0.15); /* Increased transparency */
+  --text-color: #333333;
+  --border-radius: 16px; /* Slightly more rounded */
+  --box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); /* Softer, more diffused shadow */
+  --backdrop-filter: blur(15px); /* Stronger blur for frosted effect */
+  --font-family: 'Roboto', sans-serif;
+  --button-color: #007bff;
+  --button-hover-color: #0056b3;
+  --button-disabled-color: #cccccc;
+
+
   margin: 0 auto;
-  padding: 20px;
-  font-family: Arial, sans-serif;
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  font-family: var(--font-family);
+  background: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  backdrop-filter: var(--backdrop-filter);
+  color: var(--text-color);
 }
 
 h1 {
   text-align: center;
-  color: #333;
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Enhanced text shadow */
 }
 
 .section {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
+  padding: 15px;
+  background: var(--background-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  backdrop-filter: var(--backdrop-filter);
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border for layering */
 }
 
 h2 {
-  color: #555;
-  margin-bottom: 10px;
+  color: var(--secondary-color);
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+  padding-bottom: 5px;
 }
 
-.input, .textarea {
+.input,
+.textarea {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Subtle border */
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.25); /* Increased transparency */
+  color: var(--text-color);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1); /* Softer inset shadow */
+  backdrop-filter: var(--backdrop-filter);
+  box-sizing: border-box;
 }
 
 .textarea {
-  height: 100px;
+  height: 120px;
   resize: vertical;
+   position: relative;
+  overflow: auto;
+}
+
+.textarea::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(0, 0, 0, 0.1));
+  pointer-events: none;
+  display: none; /* Hidden by default */
+}
+
+.textarea:focus::after,
+.textarea:active::after {
+  display: block; /* Show shadow when textarea is active */
 }
 
 .button {
   display: inline-block;
-  padding: 10px 20px;
+  padding: 12px 25px;
   margin-right: 10px;
-  background-color: #007bff;
-  color: #fff;
+  background: var(--button-color);
+  color: #ffffff;
   border: none;
-  border-radius: 4px;
-  font-size: 14px;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2); /* Enhanced button shadow */
 }
 
 .button:hover {
-  background-color: #0056b3;
+  background: var(--button-hover-color);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Stronger hover shadow */
 }
 
 .button:disabled {
-  background-color: #ccc;
+  background: var(--button-disabled-color);
   cursor: not-allowed;
+}
+
+.button:active {
+  transform: translateY(1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Softer active shadow */
+}
+
+/* Updated scrollbar design to adapt to border radius */
+::-webkit-scrollbar {
+  width: 10px;
+  border-radius: inherit; /* Inherit border radius from parent */
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Transparent track */
+  border-radius: inherit; /* Inherit border radius from parent */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3); /* Semi-transparent thumb */
+  border-radius: inherit; /* Inherit border radius from parent */
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5); /* Brighter on hover */
 }
