@@ -8,6 +8,7 @@ import * as echarts from 'echarts';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements AfterViewInit {
+  title = 'ng-frontend';
   private chart: any;
   private data: number[] = [];
 

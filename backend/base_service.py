@@ -33,16 +33,6 @@ class BaseService:
             if self.icon:
                 self.icon.stop()
 
-        def start_transmission():
-            print("Starting data transmission...")
-            self.transmitting = True
-            self.update_taskbar_menu()
-
-        def stop_transmission():
-            print("Stopping data transmission...")
-            self.transmitting = False
-            self.update_taskbar_menu()
-
         self.transmitting = False
 
         def update_taskbar_menu():
@@ -53,6 +43,17 @@ class BaseService:
                 MenuItem("Exit", exit_service)
             ]
             self.icon.menu = Menu(*menu_items)
+
+        def start_transmission():
+            print("Starting data transmission...")
+            self.transmitting = True
+            asyncio.run_coroutine_threadsafe(self.generate_fake_data(), loop)
+            self.update_taskbar_menu()
+
+        def stop_transmission():
+            print("Stopping data transmission...")
+            self.transmitting = False
+            self.update_taskbar_menu()
 
         self.update_taskbar_menu = update_taskbar_menu
         self.icon = Icon("WebSocketService", create_image(), menu=Menu())
@@ -97,6 +98,8 @@ class BaseService:
                         await client.send(f"data:{data}")
                     except Exception as e:
                         print(f"Failed to send data: {e}")
+            else:
+                print("No WebSocket clients connected.")
             await asyncio.sleep(1)
 
     def stop_service(self):

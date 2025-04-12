@@ -9,15 +9,18 @@ This checklist outlines the key features and functionalities that a SCADA (Super
 - [ ] User authentication and role-based access control
 - [ ] Remote monitoring and control capabilities
 
-## Backend Features
-- [x] WebSocket server for real-time communication
-- [x] Ability to run as a standalone application
-- [x] Ability to run as a Windows service
-- [x] Taskbar icon with context menu options:
-  - [x] Send Notification
-  - [x] Exit
-- [ ] Integration with external devices or simulators
-- [ ] Data processing and analytics
+## Backend Features (Updated)
+- [x] WebSocket server for real-time communication.
+- [x] Ability to run as a standalone application.
+- [x] Ability to run as a Windows service.
+- [x] Taskbar icon with the following options:
+  - [x] Send Notification.
+  - [x] Start Transmission.
+  - [x] Stop Transmission.
+  - [x] Exit.
+- [x] Dynamic taskbar menu updates based on transmission state.
+- [x] Fake data generation and transmission to WebSocket clients.
+- [x] Proper handling of service stop to cleanly terminate tasks and WebSocket connections.
 
 ## Frontend Features
 - [x] Simple web interface
