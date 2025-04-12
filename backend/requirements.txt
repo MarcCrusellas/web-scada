@@ -1,0 +1,5 @@
+asyncio
+websockets
+pywin32
+pystray
+Pillow
