@@ -5,10 +5,11 @@ from pystray import Icon, Menu, MenuItem
 from PIL import Image, ImageDraw
 import json
 from pathlib import Path
-from in_memory_storage import InMemoryStorage
+from storage.in_memory_storage import InMemoryStorage
 from state_handler import StateHandler
 from dynamic_storage import DynamicStorage
 import logging
+from msg.msg_srv import MessageService
 
 # Add logging setup
 logger = logging.getLogger("BaseService")
@@ -23,9 +24,6 @@ class BaseService:
     def __init__(self):
         self.websocket_clients = set()
         self.icon = None
-        self.storage = InMemoryStorage(Path.home() / "WSCADA" / "state.json")
-        self.dynamic_storage = DynamicStorage(Path.home() / "WSCADA")
-        self.state_handler = StateHandler(self.storage)
 
     def create_taskbar_icon(self, loop):
         try:
@@ -88,26 +86,14 @@ class BaseService:
         icon_thread.start()
 
     async def websocket_handler(self, websocket):
-        def log_websocket_event(event):
-            logger.info(f"WebSocket event: {event}")
-
-        log_websocket_event("Client connected")
         self.websocket_clients.add(websocket)
         try:
             async for message in websocket:
                 data = json.loads(message)
-                if data['type'] == 'fetch' or data['type'] == 'update':
-                    await self.state_handler.handle_fetch(websocket, data) if data['type'] == 'fetch' else await self.state_handler.handle_update(websocket, data)
-                elif data['type'] == 'set_file':
-                    self.dynamic_storage.set_file_content(Path(data['fileName']), data['fileContent'])
-                    await websocket.send(json.dumps({"type": "set_file", "status": "success"}))
-                elif data['type'] == 'get_file':
-                    result = self.dynamic_storage.get_file_content(Path(data['fileName']))
-                    await websocket.send(json.dumps({"type": "get_file", "content": result}))
-                else:
-                    await websocket.send(json.dumps({"type": "error", "message": "Unsupported message type"}))
+                response = MessageService.handle_message(data)
+                await websocket.send(json.dumps(response))
         except websockets.ConnectionClosed:
-            log_websocket_event("Client disconnected")
+            logger.info("WebSocket connection closed.")
         finally:
             self.websocket_clients.remove(websocket)
 

@@ -1,6 +1,7 @@
 import { signal , Component} from '@angular/core';
 import { StorageService } from '../core/services/storage.service';
 import { CodeEditorComponent } from '../components/code-editor/code-editor.component';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-test-communication',
@@ -21,7 +22,15 @@ export class TestCommunicationComponent {
       alert('State key cannot be empty!');
       return;
     }
-    this.storageService.fetchState(this.stateKey()).then(value => {
+    this.storageService.Communicate({
+      type: 'json-key',
+      args: {
+        env: 'testState',
+        type: 'fetch',
+        key: this.stateKey(),
+      },
+      uuid: uuid.v4(),
+    }).then((value) => {
       this.stateValue.set(value || '');
       console.log('Fetched state:', value);
     });
@@ -32,7 +41,17 @@ export class TestCommunicationComponent {
       alert('State key cannot be empty!');
       return;
     }
-    this.storageService.updateState(this.stateKey(), this.stateValue());
+    this.storageService.Communicate({
+      type: 'json-key',
+      args: {
+        env: 'testState',
+        type: 'update',
+        key: this.stateKey(),
+        value: this.stateValue(),
+      },
+      uuid: uuid.v4(),
+    });
+
     console.log('State updated with key:', this.stateKey(), 'value:', this.stateValue());
   }
 
@@ -41,7 +60,16 @@ export class TestCommunicationComponent {
       alert('File name cannot be empty!');
       return;
     }
-    this.storageService.setFile(this.fileName(), this.fileContent());
+    this.storageService.Communicate({
+      type: 'file-content',
+      args: {
+        project: 'testProject',
+        file_name: this.fileName(),
+        type: 'set_file',
+        value: this.fileContent(),
+      },
+      uuid: uuid.v4(),
+    });
     console.log('File set with name:', this.fileName());
   }
 
@@ -51,7 +79,16 @@ export class TestCommunicationComponent {
       return;
     }
     console.log('Fetching file with name:', this.fileName());
-    this.storageService.getFile(this.fileName()).then((content: string | null) => {
+
+    this.storageService.Communicate({
+      type: 'file-content',
+      args: {
+        project: 'testProject',
+        file_name: this.fileName(),
+        type: 'get_file',
+      },
+      uuid: uuid.v4(),
+    }).then((content) => {
       this.fileContent.set(content || '');
       console.log('Fetched file content:', content);
     });

@@ -1,8 +1,11 @@
 import json
 from pathlib import Path
 from threading import RLock
+import re
 
 class InMemoryStorage:
+    VALID_FILE_NAME_REGEX = re.compile(r'^[\w,\s-]+\.[A-Za-z]{3}$')
+
     def __init__(self, storage_path):
         self.state = {}
         self.storage_path = Path(storage_path)
@@ -21,43 +24,38 @@ class InMemoryStorage:
                         self.state = {}
 
     def save_state(self):
-        print("Attempting to acquire lock for save_state...")
         with self.lock:
-            print("Lock acquired for save_state.")
             try:
-                # Validate state before saving
                 if not isinstance(self.state, dict):
                     raise ValueError(f"State is not a dictionary: {type(self.state)}")
 
                 if not self.storage_path.exists():
-                    print(f"File {self.storage_path} does not exist. Creating it.")
                     self.storage_path.touch()
 
-                print(f"Attempting to save state to file: {self.storage_path}")
                 with open(self.storage_path, 'w') as file:
                     json.dump(self.state, file, indent=4)
-                print("State saved successfully.")
             except json.JSONDecodeError as e:
                 print(f"JSON serialization error: {e}")
             except Exception as e:
                 print(f"Error saving state to {self.storage_path}: {e}")
-            finally:
-                print("Releasing lock for save_state.")
 
     def update_state(self, key, value):
-        print(f"Attempting to acquire lock for update_state with key: {key}, value: {value}...")
         with self.lock:
-            print("Lock acquired for update_state.")
             try:
                 self.state[key] = value
-                print(f"State updated in memory: {self.state}")
                 self.save_state()
-                print(f"State successfully persisted for key: {key}")
             except Exception as e:
                 print(f"Error updating state for key {key}: {e}")
-            finally:
-                print("Releasing lock for update_state.")
 
     def get_state(self, key):
         with self.lock:
             return self.state.get(key, None)
+
+    @staticmethod
+    def is_valid_file_name(file_name):
+        """
+        Validate the file name using a regex pattern.
+        :param file_name: The file name to validate.
+        :return: True if valid, False otherwise.
+        """
+        return bool(InMemoryStorage.VALID_FILE_NAME_REGEX.match(file_name))

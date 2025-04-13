@@ -1,5 +1,5 @@
 import json
-from in_memory_storage import InMemoryStorage
+from storage.in_memory_storage import InMemoryStorage
 
 class StateHandler:
     def __init__(self, storage):
